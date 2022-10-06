@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: app_code_db
+    # image: mcr.microsoft.com/mssql/server:2017-latest
+    image: mcr.microsoft.com/azure-sql-edge
+    # issues using the mssql image above on ARM (Apple M1): https://github.com/microsoft/mssql-docker/issues/668, so try azure sql instead
+    ports:
+      - "8181:1433"
+    expose:
+      - "1433"
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: <YourStrong!Passw0rd>
+
+  api:
+    depends_on:
+      - db
+    build: .
+    container_name: app_code_api
+    ports:
+      - "8100:80"
+    environment:
+      APPCODEENV_ConnectionStrings__DbContext: "Server=db; Database=AppCodeDb; User Id=sa; Password=<YourStrong!Passw0rd>;"
+
+      
+          
